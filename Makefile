@@ -1,40 +1,32 @@
-#CC           = avr-gcc
-#CFLAGS       = -Wall -mmcu=atmega16 -Os -Wl,-Map,test.map
-#OBJCOPY      = avr-objcopy
 CC           = gcc
-CFLAGS       = -Wall -Os -Wl,-Map,test.map
+
+NOVAPROVA_CFLAGS= $(shell pkg-config --cflags novaprova)
+NOVAPROVA_LIBS= $(shell pkg-config --libs novaprova)
+
+CFLAGS       = -Wall -g $(NOVAPROVA_CFLAGS)
 OBJCOPY      = objcopy
 
-# include path to AVR library
-INCLUDE_PATH = /usr/lib/avr/include
 # splint static check
-SPLINT       = splint test.c aes.c -I$(INCLUDE_PATH) +charindex -unrecog
+SPLINT       = splint test.c aes.c +charindex -unrecog
 
 .SILENT:
 .PHONY:  lint clean
 
+CODE_SOURCE= aes.c
+CODE_OBJS= $(CODE_SOURCE:.c=.o)
 
-rom.hex : test.out
-	# copy object-code to new image and format in hex
-	$(OBJCOPY) -j .text -O ihex test.out rom.hex
+TEST_SOURCE= test/aes.c
+TEST_OBJS= $(TEST_SOURCE:.c=.o)
 
-test.o : test.c
-	# compiling test.c
-	$(CC) $(CFLAGS) -c test.c -o test.o
-
-aes.o : aes.h aes.c
-	# compiling aes.c
-	$(CC) $(CFLAGS) -c aes.c -o aes.o
-
-test.out : aes.o test.o
-	# linking object code to binary
-	$(CC) $(CFLAGS) aes.o test.o -o test.out
-
-small: test.out
-	$(OBJCOPY) -j .text -O ihex test.out rom.hex
+testrunner:  $(TEST_OBJS) $(CODE_OBJS)
+	$(LINK.c) -o $@ $(TEST_OBJS) $(CODE_OBJS) $(NOVAPROVA_LIBS)
 
 clean:
-	rm -f *.OBJ *.LST *.o *.gch *.out *.hex *.map
+	rm testrunner $(CODE_OBJS) $(TEST_OBJS)
 
 lint:
 	$(call SPLINT)
+
+test:  testrunner
+	./testrunner
+	
