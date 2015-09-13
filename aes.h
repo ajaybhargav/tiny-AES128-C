@@ -33,6 +33,15 @@ void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t *output);
 void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
 void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
 
+/* These variants encrypt and decrypt the data block in-place.
+ * The data block length MUST be a multiple of the algorithm block size (16 bytes) 
+ * The return value will be non-zero if the length is incorrect.
+ * For the decypt function, the iv data must be writable, and will be modified on return.
+ */
+uint8_t AES128_CBC_encrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv);
+uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, uint8_t* iv);
+
+
 #endif // #if defined(CBC) && CBC
 
 
