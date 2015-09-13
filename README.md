@@ -13,6 +13,15 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
 You can choose to use one or both of the modes-of-operation, by defining the symbols CBC and ECB. See the header file for clarification.
 
+Additionally, there are two variants of the CBC functions that operate on the buffer "in-place"
+
+```C
+uint8_t AES128_CBC_encrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv);
+uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, uint8_t* iv);
+```
+
+These have their own restrictions, see the header file for details.
+
 The module uses around 200 bytes of RAM and 2.5K ROM when compiled for ARM (~2K for Thumb but YMMV).
 
 It is the smallest implementation in C I've seen yet, but do contact me if you know of something smaller (or have improvements to the code here).
