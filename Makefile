@@ -12,10 +12,10 @@ SPLINT       = splint test.c aes.c +charindex -unrecog
 .SILENT:
 .PHONY:  lint clean
 
-CODE_SOURCE= aes.c
+CODE_SOURCE= aes.c pkcs7_padding.c
 CODE_OBJS= $(CODE_SOURCE:.c=.o)
 
-TEST_SOURCE= test/aes.c
+TEST_SOURCE= test/aes.c test/pkcs7_padding.c
 TEST_OBJS= $(TEST_SOURCE:.c=.o)
 
 testrunner:  $(TEST_OBJS) $(CODE_OBJS)
