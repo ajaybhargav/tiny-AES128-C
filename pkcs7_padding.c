@@ -27,3 +27,30 @@ int pkcs7_padding_valid( uint8_t *buffer, size_t data_length, size_t buffer_size
   }
   return 1;
 }
+
+size_t pkcs7_padding_data_length( uint8_t * buffer, size_t buffer_size, uint8_t modulus ){
+  /* test for valid buffer size */
+  if( buffer_size % modulus != 0 ||
+    buffer_size < modulus ){
+    return 0;
+  }
+  uint8_t padding_value;
+  padding_value = buffer[buffer_size-1];
+  /* test for valid padding value */
+  if( padding_value < 1 || padding_value > modulus ){
+    return 0;
+  }
+  /* buffer must be at least padding_value + 1 in size */
+  if( buffer_size < padding_value + 1 ){
+    return 0;
+  }
+  uint8_t count = 1;
+  buffer_size --;
+  for( ; count  < padding_value ; count++){
+    buffer_size --;
+    if( buffer[buffer_size] != padding_value ){
+      return 0;
+    }
+  }
+  return buffer_size;
+}
