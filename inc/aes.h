@@ -22,7 +22,9 @@ extern "C" {
   #define ECB 1
 #endif
 
-
+#ifndef CMAC
+  #define CMAC 1
+#endif
 
 #if defined(ECB) && ECB
 
@@ -53,5 +55,10 @@ uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t*
 #endif
 
 
+#if defined(CMAC) && CMAC
+
+void AES128_CMAC(uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key);
+
+#endif // #if defined(CMAC) && CMAC
 
 #endif //_AES_H_
