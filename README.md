@@ -5,10 +5,10 @@ This is a small and portable implementation of the AES128 ECB and CBC encryption
 The API is very simple and looks like this (I am using C99 `<stdint.h>`-style annotated types):
 
 ```C
-void AES128_ECB_encrypt(uint8_t* input, const uint8_t* key, uint8_t* output);
-void AES128_ECB_decrypt(uint8_t* input, const uint8_t* key, uint8_t* output);
-void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
-void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
+void AES128_ECB_encrypt(aes_t *aes, uint8_t* input, const uint8_t* key, uint8_t* output);
+void AES128_ECB_decrypt(aes_t *aes, uint8_t* input, const uint8_t* key, uint8_t* output);
+void AES128_CBC_encrypt_buffer(aes_t *aes, uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
+void AES128_CBC_decrypt_buffer(aes_t *aes, uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
 ```
 
 You can choose to use one or both of the modes-of-operation, by defining the symbols CBC and ECB. See the header file for clarification.

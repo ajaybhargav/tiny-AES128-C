@@ -75,7 +75,8 @@ static void test_encrypt_ecb_verbose(void)
     printf("ciphertext:\n");
     for(i = 0; i < 4; ++i)
     {
-        AES128_ECB_encrypt(plain_text + (i*16), key, buf+(i*16));
+        aes_t aes;
+        AES128_ECB_encrypt(&aes, plain_text + (i*16), key, buf+(i*16));
         phex(buf + (i*16));
     }
     printf("\n");
@@ -89,7 +90,8 @@ static void test_encrypt_ecb(void)
   uint8_t out[] = {0x3a, 0xd7, 0x7b, 0xb4, 0x0d, 0x7a, 0x36, 0x60, 0xa8, 0x9e, 0xca, 0xf3, 0x24, 0x66, 0xef, 0x97};
   uint8_t buffer[16];
 
-  AES128_ECB_encrypt(in, key, buffer);
+  aes_t aes;
+  AES128_ECB_encrypt(&aes, in, key, buffer);
 
   printf("ECB decrypt: ");
 
@@ -119,10 +121,11 @@ static void test_decrypt_cbc(void)
                     0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
   uint8_t buffer[64];
 
-  AES128_CBC_decrypt_buffer(buffer+0, in+0,  16, key, iv);
-  AES128_CBC_decrypt_buffer(buffer+16, in+16, 16, 0, 0);
-  AES128_CBC_decrypt_buffer(buffer+32, in+32, 16, 0, 0);
-  AES128_CBC_decrypt_buffer(buffer+48, in+48, 16, 0, 0);
+  aes_t aes;
+  AES128_CBC_decrypt_buffer(&aes, buffer+0, in+0,  16, key, iv);
+  AES128_CBC_decrypt_buffer(&aes, buffer+16, in+16, 16, 0, 0);
+  AES128_CBC_decrypt_buffer(&aes, buffer+32, in+32, 16, 0, 0);
+  AES128_CBC_decrypt_buffer(&aes, buffer+48, in+48, 16, 0, 0);
 
   printf("CBC decrypt: ");
 
@@ -150,7 +153,8 @@ static void test_encrypt_cbc(void)
                     0x3f, 0xf1, 0xca, 0xa1, 0x68, 0x1f, 0xac, 0x09, 0x12, 0x0e, 0xca, 0x30, 0x75, 0x86, 0xe1, 0xa7 };
   uint8_t buffer[64];
 
-  AES128_CBC_encrypt_buffer(buffer, in, 64, key, iv);
+  aes_t aes;
+  AES128_CBC_encrypt_buffer(&aes, buffer, in, 64, key, iv);
 
   printf("CBC encrypt: ");
 
@@ -172,7 +176,8 @@ static void test_decrypt_ecb(void)
   uint8_t out[] = {0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a};
   uint8_t buffer[16];
 
-  AES128_ECB_decrypt(in, key, buffer);
+  aes_t aes;
+  AES128_ECB_decrypt(&aes, in, key, buffer);
 
   printf("ECB decrypt: ");
 
