@@ -498,7 +498,7 @@ static void XorWithIv(uint8_t* buf)
 
 void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
-  uintptr_t i;
+  size_t i;
   uint8_t remainders = length % KEYLEN; /* Remaining bytes in the last non-full block */
 
   BlockCopy(output, input);
@@ -538,7 +538,7 @@ void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
 void AES128_CBC_decrypt_buffer(uint8_t* output, const uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv)
 {
-  uintptr_t i;
+  size_t i;
   uint8_t remainders = length % KEYLEN; /* Remaining bytes in the last non-full block */
   
   BlockCopy(output, input);
@@ -576,6 +576,82 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, const uint8_t* input, uint32_t l
     InvCipher();
   }
 }
+
+uint8_t AES128_CBC_encrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv){
+  size_t i;
+  state = NULL;
+  
+  /* Check for valid length. Must be > 0 and a multiple of KEYLEN */
+  if( length % KEYLEN != 0 || length == 0){
+    return 1;
+  }
+
+  // Skip the key expansion if key is passed as 0
+  if(0 != key)
+  {
+    Key = key;
+    KeyExpansion();
+  }
+
+  if(iv != 0)
+  {
+    Iv = (uint8_t*)iv;
+  }
+
+  for(i = 0; i < length; i += KEYLEN)
+  {
+    XorWithIv(data);
+    state = (state_t*)data;
+    Cipher();
+    Iv = data;
+    data += KEYLEN;
+  }
+
+  return 0;
+}
+
+/* We must have a writable iv pointer in this case, as we need the storage for holding the next decryption IV */
+uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t* key,  uint8_t* iv){
+  size_t i;
+  state = NULL;
+  uint8_t next_iv[KEYLEN];
+  
+  /* Check for valid length. Must be > 0 and a multiple of KEYLEN */
+  if( length % KEYLEN != 0 || length == 0){
+    return 1;
+  }
+  
+  if( 0 == iv )
+  {
+    return 2;
+  }
+
+  Iv = (uint8_t*)iv;
+  
+  // Skip the key expansion if key is passed as 0
+  if(0 != key)
+  {
+    Key = key;
+    KeyExpansion();
+  }
+
+  BlockCopy(next_iv,data);
+  
+  for(i = 0; i < length; i += KEYLEN)
+  {
+    state = (state_t*)data;
+    InvCipher();
+    XorWithIv(data);
+    data += KEYLEN;
+    /* use the last buffered IV */
+    BlockCopy(iv,next_iv);
+    /* and buffer the next */
+    BlockCopy(next_iv,data);
+  }
+
+  return 0;
+}
+
 
 
 #endif // #if defined(CBC) && CBC

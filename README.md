@@ -13,7 +13,14 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
 You can choose to use one or both of the modes-of-operation, by defining the symbols CBC and ECB. See the header file for clarification.
 
-There is no built-in error checking or protection from out-of-bounds memory access errors as a result of malicious input. The two functions AES128_ECB_xxcrypt() do most of the work, and they expect inputs of 128 bit length.
+Additionally, there are two variants of the CBC functions that operate on the buffer "in-place"
+
+```C
+uint8_t AES128_CBC_encrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv);
+uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, uint8_t* iv);
+```
+
+These have their own restrictions, see the header file for details.
 
 The module uses around 200 bytes of RAM and 2.5K ROM when compiled for ARM (~2K for Thumb but YMMV).
 
@@ -62,4 +69,4 @@ This implementation is verified against the data in:
 
 All material in this repository is in the public domain.
 
-I am a bit slow to react to pull requests and issues, but I have an ambition to go through all issues sometime in the future and release a stable version.
+Modifications made to test using the [NovaProva C testing framework](http://novaprova.org/)
