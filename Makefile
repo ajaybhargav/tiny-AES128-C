@@ -18,7 +18,7 @@ CODE_OBJS= $(CODE_SOURCE:.c=.o)
 ifeq ($(NOVAPROVA_CFLAGS), "")
 TEST_SOURCE= test/aes.c test/pkcs7_padding.c test/sha1.c
 else
-TEST_SOURCE= test.c
+TEST_SOURCE= test/test.c
 endif
 TEST_OBJS= $(TEST_SOURCE:.c=.o)
 
