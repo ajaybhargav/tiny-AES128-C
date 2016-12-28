@@ -1,0 +1,5 @@
+*.o
+testrunner*
+tags
+*.swp
+*.patch
