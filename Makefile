@@ -15,10 +15,14 @@ SPLINT       = splint test.c aes.c +charindex -unrecog
 CODE_SOURCE= aes.c pkcs7_padding.c sha1.c
 CODE_OBJS= $(CODE_SOURCE:.c=.o)
 
+ifeq ($(NOVAPROVA_CFLAGS), "")
 TEST_SOURCE= test/aes.c test/pkcs7_padding.c test/sha1.c
+else
+TEST_SOURCE= test.c
+endif
 TEST_OBJS= $(TEST_SOURCE:.c=.o)
 
-testrunner:  $(TEST_OBJS) $(CODE_OBJS)
+testrunner: $(TEST_OBJS) $(CODE_OBJS)
 	$(LINK.c) -o $@ $(TEST_OBJS) $(CODE_OBJS) $(NOVAPROVA_LIBS)
 
 clean:
