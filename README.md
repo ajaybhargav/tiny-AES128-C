@@ -69,4 +69,4 @@ This implementation is verified against the data in:
 
 All material in this repository is in the public domain.
 
-Modifications made to test using the [NovaProva C testing framework](http://novaprova.org/)
+Enhanced testing available using [NovaProva C testing framework](http://novaprova.org/)
