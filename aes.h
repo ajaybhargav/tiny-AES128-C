@@ -43,7 +43,7 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, const uint8_t* input, uint32_t l
  * For the decypt function, the iv data must be writable, and will be modified on return.
  */
 uint8_t AES128_CBC_encrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv);
-uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, uint8_t* iv);
+uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv);
 
 
 #endif // #if defined(CBC) && CBC
