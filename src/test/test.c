@@ -7,7 +7,7 @@
 #define CBC 1
 #define ECB 1
 
-#include "../aes.h"
+#include "aes.h"
 
 static void phex(uint8_t* str);
 static void test_encrypt_ecb(void);

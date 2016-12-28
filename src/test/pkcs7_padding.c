@@ -1,6 +1,6 @@
 #include <np.h>
 #include "np-asserts.h"
-#include "../pkcs7_padding.h"
+#include "pkcs7_padding.h"
 
 
 static void test_pkcs7_padding_pads(void){

@@ -1,6 +1,6 @@
 #include <np.h>
 #include "np-asserts.h"
-#include "../sha1.h"
+#include "sha1.h"
 #include <stdio.h>
 
 uint8_t hmacKey1[]={

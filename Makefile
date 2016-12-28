@@ -1,10 +1,12 @@
 CC           = gcc
 
-NOVAPROVA_CFLAGS= $(shell pkg-config --cflags novaprova)
-NOVAPROVA_LIBS= $(shell pkg-config --libs novaprova)
+NOVAPROVA_CFLAGS= $(shell pkg-config --cflags novaprova 2>/dev/null)
+NOVAPROVA_LIBS= $(shell pkg-config --libs novaprova 2>/dev/null)
 
-CFLAGS       = -Wall -g $(NOVAPROVA_CFLAGS)
+CFLAGS       = -Iinc/ -Wall -g $(NOVAPROVA_CFLAGS)
 OBJCOPY      = objcopy
+OUTDIR       = build
+SRCDIR	     = src
 
 # splint static check
 SPLINT       = splint test.c aes.c +charindex -unrecog
@@ -12,25 +14,30 @@ SPLINT       = splint test.c aes.c +charindex -unrecog
 .SILENT:
 .PHONY:  lint clean
 
-CODE_SOURCE= aes.c pkcs7_padding.c sha1.c
-CODE_OBJS= $(CODE_SOURCE:.c=.o)
+$(OUTDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(dir $@)
+	echo "Compiling $<"
+	$(CC) -o $@ -c $< $(CFLAGS)
 
-ifeq ($(NOVAPROVA_CFLAGS), "")
-TEST_SOURCE= test/aes.c test/pkcs7_padding.c test/sha1.c
+_CODE_OBJS= aes.o pkcs7_padding.o sha1.o
+CODE_OBJS=$(patsubst %,$(OUTDIR)/%,$(_CODE_OBJS))
+
+ifneq ($(strip $(NOVAPROVA_CFLAGS)), )
+_TEST_OBJS= test/aes.o test/pkcs7_padding.o test/sha1.o
 else
-TEST_SOURCE= test/test.c
+_TEST_OBJS= test/test.o
 endif
-TEST_OBJS= $(TEST_SOURCE:.c=.o)
+TEST_OBJS=$(patsubst %,$(OUTDIR)/%,$(_TEST_OBJS))
 
 testrunner: $(TEST_OBJS) $(CODE_OBJS)
-	$(LINK.c) -o $@ $(TEST_OBJS) $(CODE_OBJS) $(NOVAPROVA_LIBS)
+	echo "Linking $@"
+	$(LINK.c) -o $(OUTDIR)/$@ $(TEST_OBJS) $(CODE_OBJS) $(NOVAPROVA_LIBS)
 
 clean:
-	rm testrunner $(CODE_OBJS) $(TEST_OBJS)
+	rm -rf $(OUTDIR)
 
 lint:
 	$(call SPLINT)
 
 test:  testrunner
-	./testrunner
-	
+	./$(OUTDIR)/testrunner
