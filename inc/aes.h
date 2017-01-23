@@ -58,6 +58,7 @@ uint8_t AES128_CBC_decrypt_inplace( uint8_t* data, size_t length, const uint8_t*
 #if defined(CMAC) && CMAC
 
 void AES128_CBC_encrypt_block(uint8_t* output, uint8_t* input, const uint8_t* key);
+void AES128_CMAC_generate_subkey(uint8_t* K1, uint8_t* K2, const uint8_t* key);
 void AES128_CMAC(uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key);
 
 #endif // #if defined(CMAC) && CMAC
