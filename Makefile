@@ -19,11 +19,11 @@ $(OUTDIR)/%.o: $(SRCDIR)/%.c
 	echo "Compiling $<"
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-_CODE_OBJS= aes.o pkcs7_padding.o sha1.o
+_CODE_OBJS= aes.o pkcs7_padding.o
 CODE_OBJS=$(patsubst %,$(OUTDIR)/%,$(_CODE_OBJS))
 
 ifneq ($(strip $(NOVAPROVA_CFLAGS)), )
-_TEST_OBJS= test/aes.o test/pkcs7_padding.o test/sha1.o
+_TEST_OBJS= test/aes.o test/pkcs7_padding.o
 else
 _TEST_OBJS= test/test.o
 endif
