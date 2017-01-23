@@ -38,18 +38,6 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 #include "aes.h"
 
 
-/*****************************************************************************/
-/* Defines:                                                                  */
-/*****************************************************************************/
-// The number of columns comprising a state in AES. This is a constant in AES. Value=4
-#define Nb 4
-// The number of 32 bit words in a key.
-#define Nk 4
-// Key length in bytes [128 bit]
-#define KEYLEN 16
-// The number of rounds in AES Cipher.
-#define Nr 10
-
 // jcallan@github points out that declaring Multiply as a function 
 // reduces code size considerably with the Keil ARM compiler.
 // See this link for more information: https://github.com/kokke/tiny-AES128-C/pull/3
@@ -561,7 +549,8 @@ void AES128_CBC_decrypt_buffer(aes_t *aes, uint8_t* output, const uint8_t* input
 uint8_t AES128_CBC_encrypt_inplace(aes_t *aes, uint8_t* data, size_t length, const uint8_t* key, const uint8_t* iv)
 {
   size_t i;
-  state = NULL;
+  
+  aes->state = NULL;
   
   /* Check for valid length. Must be > 0 and a multiple of KEYLEN */
   if( length % KEYLEN != 0 || length == 0){
@@ -635,18 +624,18 @@ uint8_t AES128_CBC_decrypt_inplace(aes_t *aes, uint8_t* data, size_t length, con
 
 /* this is essentially a simplified version of AES128_CBC_encrypt_buffer */
 /* simplified with an iv of all zeros and length equal to KEYLEN */
-void AES128_CBC_encrypt_block(uint8_t* output, uint8_t* input, const uint8_t* key)
+void AES128_CBC_encrypt_block(aes_t *aes, uint8_t* output, uint8_t* input, const uint8_t* key)
 {
   // Skip the key expansion if key is passed as 0
   if(0 != key)
   {
-    Key = key;
-    KeyExpansion();
+    aes->Key = key;
+    KeyExpansion(aes);
   }
 
   BlockCopy(output, input);
-  state = (state_t*)output;
-  Cipher();
+  aes->state = (aes_state_t*)output;
+  Cipher(aes);
 }
 
 void LeftShift1Bit(uint8_t* buffer) {
@@ -659,14 +648,14 @@ void LeftShift1Bit(uint8_t* buffer) {
     }
 }
 
-void AES128_CMAC_generate_subkey(uint8_t* K1, uint8_t* K2, const uint8_t* key)
+void AES128_CMAC_generate_subkey(aes_t *aes, uint8_t* K1, uint8_t* K2, const uint8_t* key)
 {
     static const uint8_t Rb15 = 0x87;
-
     uint8_t L[KEYLEN], input[KEYLEN];
+
     memset(input, 0, KEYLEN);
 
-    AES128_CBC_encrypt_block(L, input, key);
+    AES128_CBC_encrypt_block(aes, L, input, key);
     memcpy(K1, L, KEYLEN);
     LeftShift1Bit(K1);
     if (L[0] & 0x80) {  /* MSB zero*/
@@ -679,10 +668,11 @@ void AES128_CMAC_generate_subkey(uint8_t* K1, uint8_t* K2, const uint8_t* key)
     }
 }
 
-void AES128_CMAC(uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key){
+void AES128_CMAC(aes_t *aes, uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key)
+{
     uint8_t K1[KEYLEN], K2[KEYLEN], mLast[KEYLEN], i;
 
-    AES128_CMAC_generate_subkey(K1, K2, key);
+    AES128_CMAC_generate_subkey(aes, K1, K2, key);
     uint32_t nrBlocks = msgLen/KEYLEN + (msgLen % KEYLEN != 0); /*ceil(msgLen / KEYLEN)*/
     uint8_t padFlag, remainders = msgLen % KEYLEN;
 
@@ -714,10 +704,10 @@ void AES128_CMAC(uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key){
         for (i = 0; i < KEYLEN; ++i) {
             Y[i] = X[i] ^ message[j *  KEYLEN + i];
         }
-        AES128_CBC_encrypt_block(X, Y, key);
+        AES128_CBC_encrypt_block(aes, X, Y, key);
     }
     for (i = 0; i < KEYLEN; ++i) {
         Y[i] = X[i] ^ mLast[i];
     }
-    AES128_CBC_encrypt_block(mac, Y, key);
+    AES128_CBC_encrypt_block(aes, mac, Y, key);
 }

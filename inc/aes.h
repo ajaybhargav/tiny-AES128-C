@@ -26,6 +26,18 @@ extern "C" {
   #define CMAC 1
 #endif
 
+/*****************************************************************************/
+/* Defines:                                                                  */
+/*****************************************************************************/
+// The number of columns comprising a state in AES. This is a constant in AES. Value=4
+#define Nb 4
+// The number of 32 bit words in a key.
+#define Nk 4
+// Key length in bytes [128 bit]
+#define KEYLEN 16
+// The number of rounds in AES Cipher.
+#define Nr 10
+
 typedef uint8_t aes_state_t[4][4];
 typedef struct _aes_t aes_t;
 
@@ -70,9 +82,9 @@ uint8_t AES128_CBC_decrypt_inplace(aes_t *aes, uint8_t* data, size_t length, con
 
 #if defined(CMAC) && CMAC
 
-void AES128_CBC_encrypt_block(uint8_t* output, uint8_t* input, const uint8_t* key);
-void AES128_CMAC_generate_subkey(uint8_t* K1, uint8_t* K2, const uint8_t* key);
-void AES128_CMAC(uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key);
+void AES128_CBC_encrypt_block(aes_t *aes, uint8_t* output, uint8_t* input, const uint8_t* key);
+void AES128_CMAC_generate_subkey(aes_t *aes, uint8_t* K1, uint8_t* K2, const uint8_t* key);
+void AES128_CMAC(aes_t *aes, uint8_t* mac, uint8_t* message, uint32_t msgLen, uint8_t* key);
 
 #endif // #if defined(CMAC) && CMAC
 

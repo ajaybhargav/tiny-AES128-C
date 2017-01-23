@@ -17,7 +17,6 @@ static void test_encrypt_cbc(void);
 static void test_decrypt_cbc(void);
 static void test_aes_cmac(void);
 
-
 int main(void)
 {
     test_encrypt_cbc();
@@ -29,8 +28,6 @@ int main(void)
 
     return 0;
 }
-
-
 
 // prints string as hex
 static void phex(uint8_t* str)
@@ -44,6 +41,7 @@ static void phex(uint8_t* str)
 static void test_encrypt_ecb_verbose(void)
 {
     // Example of more verbose verification
+    aes_t aes = {0};
 
     uint8_t i, buf[64], buf2[64];
 
@@ -75,7 +73,6 @@ static void test_encrypt_ecb_verbose(void)
     printf("ciphertext:\n");
     for(i = 0; i < 4; ++i)
     {
-        aes_t aes;
         AES128_ECB_encrypt(&aes, plain_text + (i*16), key, buf+(i*16));
         phex(buf + (i*16));
     }
@@ -214,12 +211,13 @@ static void test_aes_cmac(void)
   uint8_t cmac64[] = {0x51, 0xf0, 0xbe, 0xbf, 0x7e, 0x3b, 0x9d, 0x92, 0xfc, 0x49, 0x74, 0x17, 0x79, 0x36, 0x3c, 0xfe};
   /*buffers*/
   uint8_t B1[16], B2[16], B3[16];
+  aes_t aes;
 
   printf("AES-CMAC subkeys\n");
   printf("AES-128(key, 0)\n");
   memset(B1, 0, 16);
   memset(B2, 0, 16);
-  AES128_CBC_encrypt_buffer(B3, B1, 16, key, B2);
+  AES128_CBC_encrypt_buffer(&aes, B3, B1, 16, key, B2);
   if (0 == memcmp((char*) B3, (char*) aesK0, 16))
   {
     printf("SUCCESS!\n");
@@ -228,7 +226,7 @@ static void test_aes_cmac(void)
   {
     printf("FAILURE!\n");
   }
-  AES128_CMAC_generate_subkey(B1, B2, key);
+  AES128_CMAC_generate_subkey(&aes, B1, B2, key);
   printf("Subkeys K1, K2\n");
   if ((0 == memcmp((char*) B1, (char*) K1, 16)) && (0 == memcmp((char*) B2, (char*) K2, 16)))
   {
@@ -239,7 +237,7 @@ static void test_aes_cmac(void)
     printf("FAILURE!\n");
   }
 
-  AES128_CMAC(B1, msg0, 0, key);
+  AES128_CMAC(&aes, B1, msg0, 0, key);
   printf("AES-CMAC empty string:\n");
   if (0 == memcmp((char*) B1, (char*) cmac0, 16))
   {
@@ -251,7 +249,7 @@ static void test_aes_cmac(void)
     phex(B1);
   }
 
-  AES128_CMAC(B1, msg16, 16, key);
+  AES128_CMAC(&aes, B1, msg16, 16, key);
   printf("AES-CMAC 16 bytes:\n");
   if (0 == memcmp((char*) B1, (char*) cmac16, 16))
   {
@@ -263,7 +261,7 @@ static void test_aes_cmac(void)
     phex(B1);
   }
 
-  AES128_CMAC(B1, msg40, 40, key);
+  AES128_CMAC(&aes, B1, msg40, 40, key);
   printf("AES-CMAC 40 bytes:\n");
   if (0 == memcmp((char*) B1, (char*) cmac40, 16))
   {
@@ -275,7 +273,7 @@ static void test_aes_cmac(void)
     phex(B1);
   }
 
-  AES128_CMAC(B1, msg64, 64, key);
+  AES128_CMAC(&aes, B1, msg64, 64, key);
   printf("AES-CMAC 64 bytes:\n");
   if (0 == memcmp((char*) B1, (char*) cmac64, 16))
   {
